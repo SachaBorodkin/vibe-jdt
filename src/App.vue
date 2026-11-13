@@ -129,8 +129,8 @@ const signOut = () => supabase.auth.signOut()
     <div class="card auth">
       <h1>Configuration requise</h1>
       <p>Crée un fichier <code>.env</code> à la racine (voir <code>.env.example</code>) avec :</p>
-      <pre>VITE_SUPABASE_URL=…
-VITE_SUPABASE_ANON_KEY=…</pre>
+      <pre>JDT_SUPABASE_URL=…
+JDT_SUPABASE_ANON_KEY=…</pre>
       <p>Puis exécute <code>supabase/schema.sql</code> (ou <code>migration_projects.sql</code> si tu as déjà des données) dans le SQL Editor de Supabase et relance <code>npm run dev</code>.</p>
     </div>
   </div>

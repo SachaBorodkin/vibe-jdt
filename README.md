@@ -34,3 +34,7 @@ npm run dev
 ## Plusieurs projets
 
 Chaque projet a son propre journal (semaines, tâches, événements, totaux). Le sélecteur en haut de la barre latérale permet de changer, créer, renommer ou supprimer un projet. Les exports (Markdown / PDF) portent le nom du projet.
+
+## Variables d'environnement / Vercel
+
+Les variables s'appellent `JDT_SUPABASE_URL` et `JDT_SUPABASE_ANON_KEY` (préfixe réglé par `envPrefix` dans `vite.config.js`). Sur Vercel : Project Settings > Environment Variables, ajoute ces deux variables puis redéploie. N'utilise jamais la clé `service_role` côté front.
