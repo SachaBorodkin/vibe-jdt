@@ -25,7 +25,9 @@ const project = computed(() => projects.value.find((p) => p.id === projectId.val
 function fail(err) {
   if (err) {
     const msg = err.message || String(err)
-    if (/github_tokens|github_(repo|branch)/i.test(msg)) {
+    if (/entries[^]*?kind|kind[^]*?entries/i.test(msg)) {
+      error.value = `${msg} — la base n'est pas à jour : exécute supabase/migration_entry_kind.sql dans le SQL Editor de Supabase, puis recharge la page.`
+    } else if (/github_tokens|github_(repo|branch)/i.test(msg)) {
       error.value = `${msg} — la base n'est pas à jour : exécute supabase/migration_github.sql dans le SQL Editor de Supabase, puis recharge la page.`
     } else if (/projects|project_id/i.test(msg)) {
       error.value = `${msg} — la base n'est pas à jour : exécute supabase/migration_projects.sql dans le SQL Editor de Supabase, puis recharge la page.`
@@ -165,10 +167,10 @@ async function deleteWeek(id) {
 }
 
 /* ---------- Tâches ---------- */
-async function addEntry(week_id, date) {
+async function addEntry(week_id, date, kind = 'Implémentation') {
   const { data, error: err } = await supabase
     .from('entries')
-    .insert({ week_id, date, task: '', status: 'wip', minutes: 0 })
+    .insert({ week_id, date, task: '', kind, status: 'wip', minutes: 0 })
     .select()
     .single()
   if (fail(err)) return null

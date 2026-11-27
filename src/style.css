@@ -122,14 +122,15 @@ table.grid th { text-align: center; font-weight: 700; padding: 10px 8px; white-s
 table.grid td.center { text-align: center; }
 table.grid td.empty { color: var(--muted); text-align: center; padding: 18px; }
 table.grid td.c-act, table.grid th.c-act { width: 44px; text-align: center; border: none; padding: 0 0 0 4px; }
-table.grid .c-date { width: 132px; }
-table.grid .c-state { width: 104px; }
-table.grid .c-dur { width: 118px; white-space: nowrap; }
-table.grid .c-out { width: 96px; }
-table.grid .c-ot { width: 44px; }
-table.grid .c-art { width: 180px; }
-table.grid .c-task { width: 24%; }
-table.grid .c-comment { width: 27%; }
+table.grid .c-date { width: 118px; }
+table.grid .c-state { width: 96px; }
+table.grid .c-dur { width: 112px; white-space: nowrap; }
+table.grid .c-out { width: 92px; }
+table.grid .c-ot { width: 40px; }
+table.grid .c-art { width: 160px; }
+table.grid .c-task { width: 20%; }
+table.grid .c-comment { width: 24%; }
+table.grid .c-kind { width: 140px; }
 table.grid .c-type { width: 150px; }
 table.grid .c-desc { width: auto; }
 /* En-têtes alignés sur le contenu de leur colonne (textes à gauche, listes/valeurs au centre) */
@@ -139,7 +140,18 @@ table.grid th.c-date, table.grid th.c-task, table.grid th.c-comment, table.grid 
 /* Champs multi-lignes : le texte s'affiche en entier et le tableau s'adapte */
 table.grid .cell-stack { display: flex; flex-direction: column; gap: 2px; }
 table.grid textarea.multi { resize: none; overflow: hidden; min-height: 32px; line-height: 1.35; padding: 5px 6px; }
-table.grid tbody tr:not(.total-row):hover > td { background: color-mix(in srgb, var(--accent-soft) 30%, transparent); }
+table.grid tbody tr:not(.total-row):hover > td:not(.c-kind) { background: color-mix(in srgb, var(--accent-soft) 30%, transparent); }
+/* Colonne Type : une couleur de fond par type de tâche */
+table.grid td.c-kind { padding: 3px 5px; }
+table.grid td.c-kind select { text-align: left; letter-spacing: 0.01em; }
+table.grid td.c-kind select option { background: var(--surface); color: var(--text); }
+table.grid td.c-kind.t-doc { background: #26304c; color: #aec1ff; }
+table.grid td.c-kind.t-analyse { background: #2f2745; color: #cbb7ff; }
+table.grid td.c-kind.t-absent { background: #33363c; color: #bbc1ca; }
+table.grid td.c-kind.t-test { background: #1e3a37; color: #83ddc9; }
+table.grid td.c-kind.t-impl { background: #23382a; color: #93e2aa; }
+table.grid td.c-kind.t-custom { background: var(--kind-bg, #2b303a); color: var(--kind-fg, #cbd3e0); }
+table.grid td.c-kind .kind-custom { border-color: color-mix(in srgb, currentColor 30%, transparent); font-size: 12px; }
 table.grid input.dur { text-align: center; font-variant-numeric: tabular-nums; }
 table.grid select { text-align: center; }
 table.grid select.success { color: var(--ok); }
@@ -183,6 +195,7 @@ table.grid .total-row.project-total td { color: var(--accent); }
   body { background: #fff; color: #000; font-size: 11px; }
   .main { padding: 0; max-width: none; }
   input, select, textarea { border: none !important; background: transparent !important; appearance: none; -webkit-appearance: none; padding: 2px; color: #000; }
+  table.grid td.c-kind { background: transparent !important; color: #000 !important; }
   textarea { resize: none; }
 }
 

@@ -1,10 +1,20 @@
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { EVENT_KINDS, fmtDate, fmtDay, fmtMin, fmtTotal, sumEntries, weekNumbers, weekTitle } from './format'
+import { EVENT_KINDS, fmtDate, fmtDay, fmtMin, fmtTotal, kindClass, sumEntries, weekNumbers, weekTitle } from './format'
 
 const MARGIN = 14
 const ACCENT = [47, 91, 234]
 const GRID = [150, 156, 168]
+
+/** Couleurs de la colonne Type dans le PDF (fond clair, texte fondu). */
+const KIND_COLORS = {
+  't-doc': [[232, 238, 255], [30, 58, 138]],
+  't-analyse': [[241, 236, 255], [76, 43, 138]],
+  't-absent': [[238, 240, 243], [70, 76, 86]],
+  't-test': [[226, 246, 241], [14, 92, 80]],
+  't-impl': [[230, 246, 235], [22, 101, 52]],
+  't-custom': [[236, 239, 244], [55, 62, 74]],
+}
 
 /**
  * Génère et télécharge le journal en PDF (une table par semaine).
@@ -75,6 +85,7 @@ export function downloadPdf(weeks, entries, events, filename = 'journal-de-trava
         body.push([
           fmtDate(e.date),
           e.task + (e.status === 'wip' ? ' [WIP]' : ''),
+          e.kind || '',
           e.status === 'done' ? '[DONE]' : '[WIP]',
           e.comment || '',
           fmtMin(e.minutes),
@@ -85,7 +96,7 @@ export function downloadPdf(weeks, entries, events, filename = 'journal-de-trava
       }
       const s = sumEntries(de)
       body.push([
-        { content: `Total ${fmtDay(d)}`, colSpan: 4, styles: { halign: 'right', fontStyle: 'bold', fillColor: [245, 246, 249] } },
+        { content: `Total ${fmtDay(d)}`, colSpan: 5, styles: { halign: 'right', fontStyle: 'bold', fillColor: [245, 246, 249] } },
         { content: fmtTotal(s.total), styles: { halign: 'center', fontStyle: 'bold', fillColor: [245, 246, 249] } },
         {
           content: s.overtime ? `dont ${fmtMin(s.overtime)} d'heures supplémentaires` : '',
@@ -97,7 +108,7 @@ export function downloadPdf(weeks, entries, events, filename = 'journal-de-trava
     const ws = sumEntries(we)
     if (we.length) {
       body.push([
-        { content: 'Total semaine', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold', fillColor: [232, 238, 254], textColor: ACCENT } },
+        { content: 'Total semaine', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold', fillColor: [232, 238, 254], textColor: ACCENT } },
         { content: fmtTotal(ws.total), styles: { halign: 'center', fontStyle: 'bold', fillColor: [232, 238, 254], textColor: ACCENT } },
         {
           content: ws.overtime ? `dont ${fmtMin(ws.overtime)} HS` : '',
@@ -106,34 +117,40 @@ export function downloadPdf(weeks, entries, events, filename = 'journal-de-trava
         },
       ])
     } else {
-      body.push([{ content: 'Aucune tâche.', colSpan: 8, styles: { halign: 'center', textColor: [107, 115, 133] } }])
+      body.push([{ content: 'Aucune tâche.', colSpan: 9, styles: { halign: 'center', textColor: [107, 115, 133] } }])
     }
 
     autoTable(doc, {
       startY: y,
-      head: [['Date', 'Tâche', 'État', 'Commentaire', 'Durée', 'Artefact', 'Résultat', 'HS']],
+      head: [['Date', 'Tâche', 'Type', 'État', 'Commentaire', 'Durée', 'Artefact', 'Résultat', 'HS']],
       body,
       margin: { left: MARGIN, right: MARGIN },
       theme: 'grid',
       styles: tableStyles,
       headStyles,
       columnStyles: {
-        0: { cellWidth: 22, halign: 'center' },
-        1: { cellWidth: 55 },
-        2: { cellWidth: 18, halign: 'center' },
-        3: { cellWidth: 'auto' },
-        4: { cellWidth: 24, halign: 'center' },
-        5: { cellWidth: 18, halign: 'center' },
-        6: { cellWidth: 18, halign: 'center' },
-        7: { cellWidth: 11, halign: 'center' },
+        0: { cellWidth: 21, halign: 'center' },
+        1: { cellWidth: 48 },
+        2: { cellWidth: 26 },
+        3: { cellWidth: 17, halign: 'center' },
+        4: { cellWidth: 'auto' },
+        5: { cellWidth: 23, halign: 'center' },
+        6: { cellWidth: 17, halign: 'center' },
+        7: { cellWidth: 18, halign: 'center' },
+        8: { cellWidth: 10, halign: 'center' },
       },
       didParseCell: (data) => {
-        if (data.section === 'body' && data.column.index === 5 && data.cell.raw?.url) {
-          data.cell.styles.textColor = ACCENT
+        if (data.section !== 'body') return
+        // Colonne Type : fond clair de la couleur du type
+        if (data.column.index === 2 && typeof data.cell.raw === 'string') {
+          const [fill, text] = KIND_COLORS[kindClass(data.cell.raw)] || KIND_COLORS['t-custom']
+          data.cell.styles.fillColor = fill
+          data.cell.styles.textColor = text
         }
+        if (data.column.index === 6 && data.cell.raw?.url) data.cell.styles.textColor = ACCENT
       },
       didDrawCell: (data) => {
-        if (data.section === 'body' && data.column.index === 5 && data.cell.raw?.url) {
+        if (data.section === 'body' && data.column.index === 6 && data.cell.raw?.url) {
           doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url: data.cell.raw.url })
         }
       },

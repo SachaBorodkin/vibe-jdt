@@ -26,6 +26,7 @@ create table if not exists public.entries (
   week_id     uuid not null references public.weeks(id) on delete cascade,
   date        date not null,
   task        text not null default '',
+  kind        text not null default 'Implémentation', -- Documentation / Analyse / Absent / Test / Implémentation, ou valeur libre
   status      text not null default 'wip' check (status in ('done', 'wip')),
   minutes     integer not null default 0 check (minutes >= 0),
   commit_url  text,                       -- lien vers le commit (artefact)

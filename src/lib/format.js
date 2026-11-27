@@ -41,6 +41,21 @@ export function slugify(str) {
   )
 }
 
+/** Types de tâche proposés dans la colonne « Type » du JDT (valeur libre possible). */
+export const ENTRY_KINDS = ['Documentation', 'Analyse', 'Absent', 'Test', 'Implémentation']
+export const DEFAULT_ENTRY_KIND = 'Implémentation'
+
+/** Classe de couleur (CSS) correspondant à un type de tâche. */
+export function kindClass(kind) {
+  const k = String(kind || '').trim().toLowerCase()
+  if (k.startsWith('doc')) return 't-doc'
+  if (k.startsWith('ana')) return 't-analyse'
+  if (k.startsWith('abs')) return 't-absent'
+  if (k.startsWith('test')) return 't-test'
+  if (k.startsWith('impl')) return 't-impl'
+  return 't-custom'
+}
+
 export function toISO(d) {
   const y = d.getFullYear()
   const mo = String(d.getMonth() + 1).padStart(2, '0')
@@ -134,12 +149,12 @@ export function buildMarkdown(weeks, entries, events, projectName = '') {
       out.push(`### ${fmtDay(d)}`, '')
 
       if (de.length) {
-        out.push('| Tâche | Statut | Durée | Artefact | Résultat | HS |', '|---|---|---|---|---|---|')
+        out.push('| Tâche | Type | Statut | Durée | Artefact | Résultat | HS |', '|---|---|---|---|---|---|---|')
         for (const e of de) {
           const task = esc(e.task) + (e.status === 'wip' ? ' [WIP]' : '')
           const art = e.commit_url ? `[commit](${e.commit_url})` : ''
           const res = e.outcome === 'success' ? 'Succès' : e.outcome === 'failure' ? 'Échec' : ''
-          out.push(`| ${task} | ${e.status === 'done' ? 'Terminé' : 'En cours'} | ${fmt(e.minutes)} | ${art} | ${res} | ${e.overtime ? 'oui' : ''} |`)
+          out.push(`| ${task} | ${esc(e.kind)} | ${e.status === 'done' ? 'Terminé' : 'En cours'} | ${fmt(e.minutes)} | ${art} | ${res} | ${e.overtime ? 'oui' : ''} |`)
         }
         out.push('')
         for (const e of de) {

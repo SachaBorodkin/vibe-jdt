@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useJournal } from '../composables/useJournal'
 import {
-  EVENT_KINDS, fmtDate, fmtDay, fmtMin, fmtTotal, parseDuration, parseISO, toISO,
+  ENTRY_KINDS, EVENT_KINDS, fmtDate, fmtDay, fmtMin, fmtTotal, kindClass, parseDuration, parseISO, toISO,
   sumEntries, weekNumbers, weekTitle,
 } from '../lib/format'
 
@@ -54,6 +54,26 @@ function resizeEl(el) {
 }
 
 const vAutosize = { mounted: resizeEl, updated: resizeEl }
+
+/* Type de tâche : liste prédéfinie, ou valeur libre (« Autre… »). */
+const KIND_CUSTOM = '__custom'
+
+function presetKind(kind) {
+  return ENTRY_KINDS.includes(kind) ? kind : KIND_CUSTOM
+}
+
+function setKind(e, value) {
+  // « Autre… » vide le type en attendant la saisie libre.
+  j.updateEntry(e.id, { kind: value === KIND_CUSTOM ? '' : value })
+}
+
+/** Couleur du type : fixée par classe pour les types connus, teinte dérivée du texte pour les autres. */
+function kindStyle(kind) {
+  if (kindClass(kind) !== 't-custom') return null
+  let h = 0
+  for (const ch of String(kind || '')) h = (h * 31 + ch.charCodeAt(0)) % 360
+  return { '--kind-bg': `hsl(${h} 32% 22%)`, '--kind-fg': `hsl(${h} 65% 80%)` }
+}
 
 function defaultDate() {
   const start = parseISO(props.week.start_date)
@@ -125,6 +145,7 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
           <tr>
             <th class="c-date">Date</th>
             <th class="c-task">Tâche</th>
+            <th class="c-kind">Type</th>
             <th class="c-state">État</th>
             <th class="c-comment">Commentaire</th>
             <th class="c-dur">Durée</th>
@@ -135,7 +156,7 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
           </tr>
         </thead>
         <tbody>
-          <tr v-if="!rows.length"><td colspan="9" class="empty">Aucune tâche. Ajoutes-en une pour commencer.</td></tr>
+          <tr v-if="!rows.length"><td colspan="10" class="empty">Aucune tâche. Ajoutes-en une pour commencer.</td></tr>
           <template v-for="r in rows" :key="r.key">
             <tr v-if="r.type === 'entry'" :class="{ wip: r.e.status === 'wip' }">
               <td class="c-date">
@@ -153,6 +174,21 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
                     @change="j.updateEntry(r.e.id, { task: $event.target.value })"
                   ></textarea>
                   <span v-if="r.e.status === 'wip'" class="tag-wip">[WIP]</span>
+                </div>
+              </td>
+              <td class="c-kind" :class="kindClass(r.e.kind)" :style="kindStyle(r.e.kind)">
+                <div class="cell-stack">
+                  <select :value="presetKind(r.e.kind)" @change="setKind(r.e, $event.target.value)">
+                    <option v-for="k in ENTRY_KINDS" :key="k" :value="k">{{ k }}</option>
+                    <option :value="KIND_CUSTOM">Autre…</option>
+                  </select>
+                  <input
+                    v-if="!ENTRY_KINDS.includes(r.e.kind)"
+                    class="kind-custom"
+                    :value="r.e.kind"
+                    placeholder="Type personnalisé"
+                    @change="j.updateEntry(r.e.id, { kind: $event.target.value.trim() })"
+                  />
                 </div>
               </td>
               <td class="center">
@@ -196,7 +232,7 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
             </tr>
 
             <tr v-else class="total-row day">
-              <td colspan="4" class="right">Total {{ fmtDay(r.date) }}</td>
+              <td colspan="5" class="right">Total {{ fmtDay(r.date) }}</td>
               <td>{{ fmtTotal(r.total) }}</td>
               <td colspan="4" class="left">{{ r.overtime ? `dont ${fmtMin(r.overtime)} d'heures supplémentaires` : '' }}</td>
             </tr>
@@ -204,12 +240,12 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
         </tbody>
         <tfoot v-if="rows.length">
           <tr class="total-row week-total">
-            <td colspan="4" class="right">Total semaine</td>
+            <td colspan="5" class="right">Total semaine</td>
             <td>{{ fmtTotal(weekSum.total) }}</td>
             <td colspan="4" class="left">{{ weekSum.overtime ? `dont ${fmtMin(weekSum.overtime)} HS` : '' }}</td>
           </tr>
           <tr class="total-row project-total">
-            <td colspan="4" class="right">Total projet</td>
+            <td colspan="5" class="right">Total projet</td>
             <td>{{ fmtTotal(projectSum.total) }}</td>
             <td colspan="4" class="left">{{ projectSum.overtime ? `dont ${fmtMin(projectSum.overtime)} HS` : '' }}</td>
           </tr>

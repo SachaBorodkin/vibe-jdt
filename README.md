@@ -8,6 +8,7 @@ App Vue 3 + Vite + Supabase pour tenir un journal de travail organisé par semai
 2. Dans **SQL Editor**, exécute `supabase/schema.sql` (tables + Row Level Security).
    - Si tu utilisais déjà la version sans projets, exécute à la place `supabase/migration_projects.sql` : tes semaines existantes sont rattachées à un projet « Mon projet ».
    - Si tu veux committer le journal sur GitHub, exécute aussi `supabase/migration_github.sql` (colonnes `github_repo` / `github_branch` et table `github_tokens`).
+   - Si ta base existe déjà, exécute aussi `supabase/migration_entry_kind.sql` (colonne « Type » des tâches).
 3. Dans **Authentication > Providers**, laisse Email activé (désactive « Confirm email » si tu veux te connecter directement après inscription).
 4. Copie `.env.example` en `.env` et renseigne l'URL et la clé `anon` (Project Settings > API).
 5. Lance :
@@ -35,6 +36,10 @@ npm run dev
 ## Plusieurs projets
 
 Chaque projet a son propre journal (semaines, tâches, événements, totaux). Le sélecteur en haut de la barre latérale permet de changer, créer, renommer ou supprimer un projet. Les exports (Markdown / PDF) portent le nom du projet.
+
+### Type de tâche
+
+La colonne **Type** classe chaque tâche en `Documentation`, `Analyse`, `Absent`, `Test` ou `Implémentation`, avec une couleur de fond par type. Le choix **Autre…** ouvre un champ libre : la couleur est alors dérivée du texte saisi, ce qui distingue chaque type personnalisé. Le type apparaît dans les exports Markdown et PDF (avec les mêmes couleurs dans le PDF).
 
 ## Commit sur GitHub
 
