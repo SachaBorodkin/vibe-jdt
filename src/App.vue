@@ -5,6 +5,7 @@ import { useJournal } from './composables/useJournal'
 import AuthForm from './components/AuthForm.vue'
 import WeekView from './components/WeekView.vue'
 import GitHubPanel from './components/GitHubPanel.vue'
+import Icon from './components/Icon.vue'
 import { buildMarkdown, fmtDate, fmtMin, mondayOf, slugify, sumEntries, toISO, weekNumbers, weekTitle } from './lib/format'
 import { parseRepo } from './lib/github'
 import { commitJdt, readStoredToken } from './lib/jdtCommit'
@@ -188,13 +189,13 @@ JDT_SUPABASE_ANON_KEY=…</pre>
               {{ p.name }} · {{ fmtMin(projectStats(p.id)) }}
             </option>
           </select>
-          <button class="icon" title="Renommer le projet" @click="renameProject">✎</button>
-          <button class="icon danger" title="Supprimer le projet" @click="removeProject">🗑</button>
+          <button class="icon" title="Renommer le projet" aria-label="Renommer le projet" @click="renameProject"><Icon name="pencil" /></button>
+          <button class="icon danger" title="Supprimer le projet" aria-label="Supprimer le projet" @click="removeProject"><Icon name="trash" /></button>
         </div>
         <form v-if="addingProject || !j.projects.value.length" class="proj-row" @submit.prevent="createProject">
           <input v-model="newProject" placeholder="Nom du projet" required autofocus />
           <button class="primary">OK</button>
-          <button v-if="j.projects.value.length" type="button" class="icon" @click="addingProject = false">✕</button>
+          <button v-if="j.projects.value.length" type="button" class="icon" title="Annuler" aria-label="Annuler" @click="addingProject = false"><Icon name="x" /></button>
         </form>
         <button v-else class="ghost" @click="addingProject = true">+ Nouveau projet</button>
       </div>
@@ -213,7 +214,7 @@ JDT_SUPABASE_ANON_KEY=…</pre>
           :class="{ active: w.id === selectedId }"
           @click="selectedId = w.id"
         >
-          <span class="folder-name">📁 {{ weekTitle(w, numbers.get(w.id)) }}</span>
+          <span class="folder-name"><Icon name="folder" size="15" /> {{ weekTitle(w, numbers.get(w.id)) }}</span>
           <span class="folder-total">{{ fmtMin(weekTotal(w.id)) }}</span>
         </button>
         <p v-if="!j.weeks.value.length" class="muted small">Aucune semaine pour l'instant.</p>

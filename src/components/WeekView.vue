@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useJournal } from '../composables/useJournal'
 import DateField from './DateField.vue'
+import Icon from './Icon.vue'
 import {
   ENTRY_KINDS, EVENT_KINDS, fmtDate, fmtDay, fmtMin, fmtTotal, kindClass, parseDuration, parseISO, toISO,
   sumEntries, weekNumbers, weekTitle,
@@ -228,7 +229,7 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
                 <input type="checkbox" :checked="r.e.overtime" @change="j.updateEntry(r.e.id, { overtime: $event.target.checked })" />
               </td>
               <td class="c-act no-print">
-                <button class="icon danger" title="Supprimer" @click="j.deleteEntry(r.e.id)">✕</button>
+                <button class="icon danger" title="Supprimer" aria-label="Supprimer la tâche" @click="j.deleteEntry(r.e.id)"><Icon name="x" /></button>
               </td>
             </tr>
 
@@ -292,7 +293,9 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
               ></textarea>
             </td>
             <td><input class="dur" :value="fmtMin(v.minutes_lost)" @change="setLost(v, $event)" /></td>
-            <td class="c-act no-print"><button class="icon danger" title="Supprimer" @click="j.deleteEvent(v.id)">✕</button></td>
+            <td class="c-act no-print">
+              <button class="icon danger" title="Supprimer" aria-label="Supprimer l'événement" @click="j.deleteEvent(v.id)"><Icon name="x" /></button>
+            </td>
           </tr>
         </tbody>
       </table>

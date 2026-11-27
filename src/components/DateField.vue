@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { fmtDateSlash, parseDateInput } from '../lib/format'
+import Icon from './Icon.vue'
 
 const props = defineProps({ modelValue: { type: String, default: '' } })
 const emit = defineEmits(['update:modelValue'])
@@ -65,7 +66,7 @@ function openPicker() {
       aria-label="Choisir dans le calendrier"
       @click="openPicker"
     >
-      📅
+      <Icon name="calendar" size="15" />
     </button>
     <input
       ref="native"

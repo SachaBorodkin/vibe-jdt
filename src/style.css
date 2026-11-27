@@ -54,7 +54,10 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 button.ghost { background: transparent; }
 button.danger:hover { border-color: var(--danger); color: var(--danger); }
 button.link { border: none; background: none; color: var(--accent); }
-button.icon { padding: 4px 8px; border-color: transparent; background: transparent; }
+button.icon { padding: 4px 8px; border-color: transparent; background: transparent; display: inline-flex; align-items: center; justify-content: center; }
+/* Icônes SVG (aucun emoji dans l'interface) */
+.ico { flex: none; display: block; }
+.folder-name { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
 
 /* Layout */
 .layout { display: grid; grid-template-columns: 290px 1fr; min-height: 100vh; }
@@ -146,7 +149,7 @@ table.grid tbody tr:not(.total-row):hover > td:not(.c-kind) { background: color-
 /* Champ date au format jj/mm/aaaa, quel que soit la langue du navigateur */
 .datefield { position: relative; display: flex; align-items: center; gap: 2px; }
 .datefield .date-text { min-width: 0; padding-right: 0; font-variant-numeric: tabular-nums; }
-.datefield .date-pick { padding: 4px 5px; border: 1px solid transparent; background: none; color: var(--muted); border-radius: 6px; line-height: 1; }
+.datefield .date-pick { padding: 4px 5px; border: 1px solid transparent; background: none; color: var(--muted); border-radius: 6px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
 .datefield .date-pick:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
 .datefield .date-native { position: absolute; right: 6px; bottom: 0; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; pointer-events: none; }
 /* Colonne Type : une couleur de fond par type de tâche */
