@@ -99,7 +99,7 @@ button.icon { padding: 4px 8px; border-color: transparent; background: transpare
 .stat span { color: var(--muted); font-size: 12px; }
 .stat strong { font-size: 18px; font-variant-numeric: tabular-nums; }
 
-.main { padding: 30px 36px; max-width: 1400px; width: 100%; }
+.main { padding: 30px 36px; max-width: 1800px; width: 100%; }
 
 /* Semaine : titre souligné + tableau quadrillé */
 .week { display: flex; flex-direction: column; gap: 16px; }
@@ -117,6 +117,8 @@ h3.sub { font-size: 20px; margin-top: 14px; border-bottom: 1px solid var(--grid)
 
 .table-scroll { overflow-x: auto; }
 table.grid { width: 100%; border-collapse: collapse; }
+/* Largeur plancher du journal : en dessous, le tableau défile au lieu d'écraser les colonnes */
+table.grid.entries { min-width: 1300px; }
 table.grid th, table.grid td { border: 1px solid var(--grid); padding: 4px 6px; vertical-align: middle; }
 table.grid th { text-align: center; font-weight: 700; padding: 10px 8px; white-space: nowrap; }
 table.grid td.center { text-align: center; }
@@ -202,6 +204,7 @@ table.grid .total-row.project-total td { color: var(--accent); }
   .main { padding: 0; max-width: none; }
   input, select, textarea { border: none !important; background: transparent !important; appearance: none; -webkit-appearance: none; padding: 2px; color: #000; }
   table.grid td.c-kind { background: transparent !important; color: #000 !important; }
+  table.grid { min-width: 0 !important; }
   textarea { resize: none; }
 }
 
