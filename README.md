@@ -7,6 +7,7 @@ App Vue 3 + Vite + Supabase pour tenir un journal de travail organisé par semai
 1. Crée un projet sur [supabase.com](https://supabase.com).
 2. Dans **SQL Editor**, exécute `supabase/schema.sql` (tables + Row Level Security).
    - Si tu utilisais déjà la version sans projets, exécute à la place `supabase/migration_projects.sql` : tes semaines existantes sont rattachées à un projet « Mon projet ».
+   - Si tu veux committer le journal sur GitHub, exécute aussi `supabase/migration_github.sql` (colonnes `github_repo` / `github_branch`).
 3. Dans **Authentication > Providers**, laisse Email activé (désactive « Confirm email » si tu veux te connecter directement après inscription).
 4. Copie `.env.example` en `.env` et renseigne l'URL et la clé `anon` (Project Settings > API).
 5. Lance :
@@ -34,6 +35,22 @@ npm run dev
 ## Plusieurs projets
 
 Chaque projet a son propre journal (semaines, tâches, événements, totaux). Le sélecteur en haut de la barre latérale permet de changer, créer, renommer ou supprimer un projet. Les exports (Markdown / PDF) portent le nom du projet.
+
+## Commit sur GitHub
+
+Chaque projet peut être rattaché à un dépôt GitHub. Dans la barre latérale, ouvre **Dépôt GitHub**, puis renseigne :
+
+- le dépôt, au format `propriétaire/dépôt` (ex. `SachaBorodkin/vibe-jdt`) ;
+- la branche (par défaut `main`) ;
+- un jeton d'accès personnel GitHub avec le droit **Contents : Read and write** sur ce dépôt (fine-grained token, ou token classique `ghp_…` avec le scope `repo`).
+
+Le bouton **Commit JDT dans le repo sous doc/** écrit le journal du projet dans `doc/jdt-<projet>.md` (fichier stable, mis à jour à chaque commit) avec le message :
+
+```
+docs(doc): Rédaction du JDT (fichier généré à partir de https://vibe-jdt.vercel.app/)
+```
+
+Le dépôt et la branche sont enregistrés sur le projet (Supabase). Le jeton, lui, reste dans le navigateur (`localStorage`, clé `jdt:githubToken`) et n'est jamais envoyé à Supabase : utilise un jeton limité à ce seul dépôt.
 
 ## Variables d'environnement / Vercel
 

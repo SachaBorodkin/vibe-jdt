@@ -6,6 +6,8 @@ create table if not exists public.projects (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null default auth.uid() references auth.users(id) on delete cascade,
   name        text not null,
+  github_repo    text,                     -- dépôt GitHub cible du commit (propriétaire/dépôt)
+  github_branch  text not null default 'main',
   created_at  timestamptz not null default now()
 );
 

@@ -181,4 +181,21 @@ table.grid .total-row.project-total td { color: var(--accent); }
 .proj-label { color: var(--muted); font-size: 12px; }
 .proj-row { display: flex; gap: 4px; align-items: center; }
 .proj-row select, .proj-row input { border-color: var(--border); background: var(--surface); }
+/* Dépôt GitHub */
+.github {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.github summary { cursor: pointer; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+.github form { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.github form label { display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 12px; }
+.github form input { border-color: var(--border); background: var(--side); }
+.github code { font-size: 12px; }
+.github .small { margin: 0; }
+
 .project-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }

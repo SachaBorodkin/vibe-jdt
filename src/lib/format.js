@@ -29,6 +29,18 @@ export function parseDuration(input) {
   return NaN
 }
 
+/** "Journal de travail" -> "journal-de-travail" (nom de fichier sûr) */
+export function slugify(str) {
+  return (
+    String(str || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'projet'
+  )
+}
+
 export function toISO(d) {
   const y = d.getFullYear()
   const mo = String(d.getMonth() + 1).padStart(2, '0')

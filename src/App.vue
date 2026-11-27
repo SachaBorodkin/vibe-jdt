@@ -4,7 +4,8 @@ import { configured, supabase } from './supabaseClient'
 import { useJournal } from './composables/useJournal'
 import AuthForm from './components/AuthForm.vue'
 import WeekView from './components/WeekView.vue'
-import { buildMarkdown, fmtDate, fmtMin, mondayOf, sumEntries, toISO, weekNumbers, weekTitle } from './lib/format'
+import GitHubPanel from './components/GitHubPanel.vue'
+import { buildMarkdown, fmtDate, fmtMin, mondayOf, slugify, sumEntries, toISO, weekNumbers, weekTitle } from './lib/format'
 import { downloadPdf } from './lib/pdf'
 
 const j = useJournal()
@@ -49,9 +50,7 @@ watch(
 )
 
 const projectName = computed(() => j.project.value?.name || 'Journal de travail')
-const slug = computed(() =>
-  projectName.value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'projet',
-)
+const slug = computed(() => slugify(projectName.value))
 
 function projectStats(id) {
   const ids = new Set(j.allWeeks.value.filter((w) => w.project_id === id).map((w) => w.id))
@@ -185,6 +184,7 @@ JDT_SUPABASE_ANON_KEY=…</pre>
         <button @click="exportMarkdown">Exporter (Markdown)</button>
         <button :disabled="!selectedWeek" @click="exportPdf(false)">Télécharger PDF (semaine)</button>
         <button :disabled="!j.weeks.value.length" @click="exportPdf(true)">Télécharger PDF (tout le projet)</button>
+        <GitHubPanel />
         <button class="ghost" @click="signOut">Déconnexion</button>
       </div>
     </aside>

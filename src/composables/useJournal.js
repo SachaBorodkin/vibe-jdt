@@ -24,9 +24,13 @@ const project = computed(() => projects.value.find((p) => p.id === projectId.val
 function fail(err) {
   if (err) {
     const msg = err.message || String(err)
-    error.value = /projects|project_id/i.test(msg)
-      ? `${msg} — la base n'est pas à jour : exécute supabase/migration_projects.sql dans le SQL Editor de Supabase, puis recharge la page.`
-      : msg
+    if (/github_(repo|branch)/i.test(msg)) {
+      error.value = `${msg} — la base n'est pas à jour : exécute supabase/migration_github.sql dans le SQL Editor de Supabase, puis recharge la page.`
+    } else if (/projects|project_id/i.test(msg)) {
+      error.value = `${msg} — la base n'est pas à jour : exécute supabase/migration_projects.sql dans le SQL Editor de Supabase, puis recharge la page.`
+    } else {
+      error.value = msg
+    }
     return true
   }
   error.value = ''
@@ -99,7 +103,7 @@ async function addProject(name) {
 async function updateProject(id, patch) {
   const p = projects.value.find((x) => x.id === id)
   if (p) Object.assign(p, patch)
-  fail((await supabase.from('projects').update(patch).eq('id', id)).error)
+  return !fail((await supabase.from('projects').update(patch).eq('id', id)).error)
 }
 
 async function deleteProject(id) {
