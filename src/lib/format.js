@@ -63,6 +63,34 @@ export function toISO(d) {
   return `${y}-${mo}-${da}`
 }
 
+/** "2026-11-09" -> "09/11/2026" (affichage des champs date, indépendant de la langue du navigateur) */
+export function fmtDateSlash(iso) {
+  const [y, m, d] = String(iso || '').split('-')
+  return y && m && d ? `${d}/${m}/${y}` : ''
+}
+
+/**
+ * Saisie de date -> ISO ("2026-11-09"), ou null si la date n'existe pas.
+ * Accepte 09/11/2026, 9.11.2026, 09-11-2026 et 2026-11-09.
+ */
+export function parseDateInput(input) {
+  const s = String(input || '').trim()
+  let m = s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/)
+  if (m) return toISOSafe(m[3], m[2], m[1])
+  m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)
+  return m ? toISOSafe(m[1], m[2], m[3]) : null
+}
+
+function toISOSafe(y, m, d) {
+  const year = Number(y)
+  const month = Number(m)
+  const day = Number(d)
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null
+  const date = new Date(year, month - 1, day)
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
 export function parseISO(iso) {
   const [y, m, d] = iso.split('-').map(Number)
   return new Date(y, m - 1, d)

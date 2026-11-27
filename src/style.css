@@ -124,7 +124,7 @@ table.grid th { text-align: center; font-weight: 700; padding: 10px 8px; white-s
 table.grid td.center { text-align: center; }
 table.grid td.empty { color: var(--muted); text-align: center; padding: 18px; }
 table.grid td.c-act, table.grid th.c-act { width: 44px; text-align: center; border: none; padding: 0 0 0 4px; }
-table.grid .c-date { width: 118px; }
+table.grid .c-date { width: 126px; }
 table.grid .c-state { width: 94px; }
 table.grid .c-dur { width: 112px; white-space: nowrap; }
 table.grid .c-out { width: 92px; }
@@ -143,6 +143,12 @@ table.grid th.c-date, table.grid th.c-task, table.grid th.c-comment, table.grid 
 table.grid .cell-stack { display: flex; flex-direction: column; gap: 2px; }
 table.grid textarea.multi { resize: none; overflow: hidden; min-height: 32px; line-height: 1.35; padding: 5px 6px; }
 table.grid tbody tr:not(.total-row):hover > td:not(.c-kind) { background: color-mix(in srgb, var(--accent-soft) 30%, transparent); }
+/* Champ date au format jj/mm/aaaa, quel que soit la langue du navigateur */
+.datefield { position: relative; display: flex; align-items: center; gap: 2px; }
+.datefield .date-text { min-width: 0; padding-right: 0; font-variant-numeric: tabular-nums; }
+.datefield .date-pick { padding: 4px 5px; border: 1px solid transparent; background: none; color: var(--muted); border-radius: 6px; line-height: 1; }
+.datefield .date-pick:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
+.datefield .date-native { position: absolute; right: 6px; bottom: 0; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; pointer-events: none; }
 /* Colonne Type : une couleur de fond par type de tâche */
 table.grid td.c-kind { padding: 3px 5px; }
 table.grid td.c-kind select { text-align: left; letter-spacing: 0.01em; }
@@ -205,6 +211,7 @@ table.grid .total-row.project-total td { color: var(--accent); }
   input, select, textarea { border: none !important; background: transparent !important; appearance: none; -webkit-appearance: none; padding: 2px; color: #000; }
   table.grid td.c-kind { background: transparent !important; color: #000 !important; }
   table.grid { min-width: 0 !important; }
+  .datefield .date-pick, .datefield .date-native { display: none !important; }
   textarea { resize: none; }
 }
 

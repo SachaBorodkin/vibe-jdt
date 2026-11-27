@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useJournal } from '../composables/useJournal'
+import DateField from './DateField.vue'
 import {
   ENTRY_KINDS, EVENT_KINDS, fmtDate, fmtDay, fmtMin, fmtTotal, kindClass, parseDuration, parseISO, toISO,
   sumEntries, weekNumbers, weekTitle,
@@ -160,7 +161,7 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
           <template v-for="r in rows" :key="r.key">
             <tr v-if="r.type === 'entry'" :class="{ wip: r.e.status === 'wip' }">
               <td class="c-date">
-                <input type="date" :value="r.e.date" @change="j.updateEntry(r.e.id, { date: $event.target.value })" />
+                <DateField :model-value="r.e.date" @update:model-value="j.updateEntry(r.e.id, { date: $event })" />
               </td>
               <td>
                 <div class="cell-stack">
@@ -271,7 +272,9 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
         <tbody>
           <tr v-if="!weekEvents.length"><td colspan="5" class="empty">Aucun événement.</td></tr>
           <tr v-for="v in weekEvents" :key="v.id">
-            <td class="c-date"><input type="date" :value="v.date" @change="j.updateEvent(v.id, { date: $event.target.value })" /></td>
+            <td class="c-date">
+              <DateField :model-value="v.date" @update:model-value="j.updateEvent(v.id, { date: $event })" />
+            </td>
             <td class="center c-type">
               <select :value="v.kind" @change="j.updateEvent(v.id, { kind: $event.target.value })">
                 <option v-for="(label, k) in EVENT_KINDS" :key="k" :value="k">{{ label }}</option>
