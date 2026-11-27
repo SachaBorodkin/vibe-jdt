@@ -123,7 +123,7 @@ table.grid td.center { text-align: center; }
 table.grid td.empty { color: var(--muted); text-align: center; padding: 18px; }
 table.grid td.c-act, table.grid th.c-act { width: 44px; text-align: center; border: none; padding: 0 0 0 4px; }
 table.grid .c-date { width: 118px; }
-table.grid .c-state { width: 96px; }
+table.grid .c-state { width: 94px; }
 table.grid .c-dur { width: 112px; white-space: nowrap; }
 table.grid .c-out { width: 92px; }
 table.grid .c-ot { width: 40px; }
@@ -153,7 +153,13 @@ table.grid td.c-kind.t-impl { background: #23382a; color: #93e2aa; }
 table.grid td.c-kind.t-custom { background: var(--kind-bg, #2b303a); color: var(--kind-fg, #cbd3e0); }
 table.grid td.c-kind .kind-custom { border-color: color-mix(in srgb, currentColor 30%, transparent); font-size: 12px; }
 table.grid input.dur { text-align: center; font-variant-numeric: tabular-nums; }
-table.grid select { text-align: center; }
+table.grid select { text-align: center; text-overflow: ellipsis; }
+/* Largeur minimale des listes déroulantes : le tableau défile plutôt que de rogner « [DONE] » ou « Implémentation » */
+table.grid td.c-state select { min-width: 82px; font-size: 13px; }
+table.grid td.c-out select { min-width: 82px; font-size: 13px; }
+table.grid td.c-kind select { min-width: 118px; font-size: 13px; }
+table.grid input.dur { min-width: 82px; }
+table.grid textarea.multi { min-width: 150px; }
 table.grid select.success { color: var(--ok); }
 table.grid select.failure { color: var(--danger); }
 tr.wip td { background: color-mix(in srgb, var(--warn-soft) 45%, transparent); }
