@@ -47,12 +47,14 @@ function needsComment(e) {
 }
 
 function defaultDate() {
-  const last = weekEntries.value[weekEntries.value.length - 1]
-  if (last) return last.date
   const start = parseISO(props.week.start_date)
   const today = new Date()
   const diff = Math.floor((today - start) / 86400000)
-  return diff >= 0 && diff <= 6 ? toISO(today) : props.week.start_date
+  // Semaine en cours : la nouvelle ligne est datée d'aujourd'hui, pas du dernier jour saisi.
+  if (diff >= 0 && diff <= 6) return toISO(today)
+  // Semaine passée : on enchaîne sur la dernière date utilisée.
+  const last = weekEntries.value[weekEntries.value.length - 1]
+  return last ? last.date : props.week.start_date
 }
 
 const newEntry = () => j.addEntry(props.week.id, defaultDate())
