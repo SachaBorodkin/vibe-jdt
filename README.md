@@ -61,7 +61,9 @@ Chaque projet peut être rattaché à un dépôt GitHub. Dans la barre latérale
 Un token classique marche aussi : [github.com/settings/tokens/new](https://github.com/settings/tokens/new) avec le seul scope `repo` (`ghp_…`).
 Les mêmes étapes sont rappelées dans l'app, sous **Dépôt GitHub → Comment créer le jeton ?**.
 
-Le bouton **Commit JDT dans le repo sous doc/** écrit le journal du projet dans `doc/jdt-<projet>.md` (fichier stable, mis à jour à chaque commit) avec le message :
+Dès qu'un dépôt et un jeton sont enregistrés pour le projet, un bouton **Commit JDT dans le repo sous doc/** apparaît directement dans la barre latérale, sous les exports PDF : plus besoin d'ouvrir le panneau pour commiter. Le même bouton reste disponible dans le panneau.
+
+Il écrit le journal du projet dans `doc/jdt-<projet>.md` (fichier stable, mis à jour à chaque commit) avec le message :
 
 ```
 docs(doc): Rédaction du JDT (fichier généré à partir de https://vibe-jdt.vercel.app/)

@@ -1,35 +1,15 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useJournal } from '../composables/useJournal'
-import { buildMarkdown, slugify } from '../lib/format'
-import { commitFile, parseRepo } from '../lib/github'
+import { parseRepo } from '../lib/github'
+import { commitJdt, jdtPath, readStoredToken, writeStoredToken } from '../lib/jdtCommit'
 
 const j = useJournal()
 const project = j.project
 
-const TOKEN_KEY = 'jdt:githubToken'
-const COMMIT_MESSAGE =
-  'docs(doc): Rédaction du JDT (fichier généré à partir de https://vibe-jdt.vercel.app/)'
-
-function readToken() {
-  try {
-    return localStorage.getItem(TOKEN_KEY) || ''
-  } catch {
-    return ''
-  }
-}
-
-function writeToken(value) {
-  try {
-    localStorage.setItem(TOKEN_KEY, value)
-  } catch {
-    /* stockage indisponible : le jeton reste en mémoire */
-  }
-}
-
 const repo = ref('')
 const branch = ref('main')
-const token = ref(j.githubToken.value || readToken())
+const token = ref(j.githubToken.value || readStoredToken())
 const busy = ref(false)
 const msg = ref('')
 const err = ref('')
@@ -56,7 +36,7 @@ watch(
 )
 
 const projectName = computed(() => project.value?.name || 'Journal de travail')
-const filePath = computed(() => `doc/jdt-${slugify(projectName.value)}.md`)
+const filePath = computed(() => jdtPath(projectName.value))
 const ready = computed(() => Boolean(parseRepo(repo.value) && token.value.trim()))
 
 async function save() {
@@ -77,7 +57,7 @@ async function save() {
   let storedToken = true
   if (value) {
     storedToken = await j.saveGithubToken(value)
-    if (storedToken) writeToken(value)
+    if (storedToken) writeStoredToken(value)
   }
   if (!storedToken) err.value = j.error.value
 
@@ -105,14 +85,14 @@ async function commit() {
   }
   busy.value = true
   try {
-    const markdown = buildMarkdown(j.weeks.value, j.entries.value, j.events.value, projectName.value)
-    const res = await commitFile({
-      token: token.value.trim(),
+    const res = await commitJdt({
+      token: token.value,
       repo: repo.value,
-      branch: branch.value.trim() || 'main',
-      path: filePath.value,
-      content: markdown,
-      message: COMMIT_MESSAGE,
+      branch: branch.value,
+      projectName: projectName.value,
+      weeks: j.weeks.value,
+      entries: j.entries.value,
+      events: j.events.value,
     })
     commitUrl.value = res.commitUrl
     msg.value = `Journal commité dans ${res.path}.`
@@ -120,7 +100,7 @@ async function commit() {
     // Le jeton est mémorisé une seule fois pour le compte (et dans ce navigateur).
     const value = token.value.trim()
     if (value && value !== j.githubToken.value) {
-      if (await j.saveGithubToken(value)) writeToken(value)
+      if (await j.saveGithubToken(value)) writeStoredToken(value)
     }
   } catch (e) {
     err.value = e?.message || String(e)

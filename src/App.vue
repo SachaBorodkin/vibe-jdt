@@ -6,6 +6,8 @@ import AuthForm from './components/AuthForm.vue'
 import WeekView from './components/WeekView.vue'
 import GitHubPanel from './components/GitHubPanel.vue'
 import { buildMarkdown, fmtDate, fmtMin, mondayOf, slugify, sumEntries, toISO, weekNumbers, weekTitle } from './lib/format'
+import { parseRepo } from './lib/github'
+import { commitJdt, readStoredToken } from './lib/jdtCommit'
 import { downloadPdf } from './lib/pdf'
 
 const j = useJournal()
@@ -16,6 +18,10 @@ const newDate = ref(toISO(mondayOf()))
 const newLabel = ref('')
 const newProject = ref('')
 const addingProject = ref(false)
+const commitBusy = ref(false)
+const commitMsg = ref('')
+const commitErr = ref('')
+const commitUrl = ref('')
 
 onMounted(async () => {
   if (!configured) {
@@ -46,11 +52,45 @@ watch(
   () => j.projectId.value,
   () => {
     selectedId.value = j.weeks.value[0]?.id ?? null
+    commitMsg.value = ''
+    commitErr.value = ''
+    commitUrl.value = ''
   },
 )
 
 const projectName = computed(() => j.project.value?.name || 'Journal de travail')
 const slug = computed(() => slugify(projectName.value))
+
+/* Commit JDT depuis la barre latérale : visible seulement si un dépôt et un jeton sont disponibles. */
+const githubReady = computed(
+  () => Boolean(parseRepo(j.project.value?.github_repo) && (j.githubToken.value || readStoredToken()).trim()),
+)
+
+async function commitJournal() {
+  const p = j.project.value
+  if (!p || commitBusy.value) return
+  commitMsg.value = ''
+  commitErr.value = ''
+  commitUrl.value = ''
+  commitBusy.value = true
+  try {
+    const res = await commitJdt({
+      repo: p.github_repo,
+      branch: p.github_branch,
+      token: j.githubToken.value || readStoredToken(),
+      projectName: projectName.value,
+      weeks: j.weeks.value,
+      entries: j.entries.value,
+      events: j.events.value,
+    })
+    commitUrl.value = res.commitUrl
+    commitMsg.value = `Journal commité dans ${res.path}.`
+  } catch (e) {
+    commitErr.value = e?.message || String(e)
+  } finally {
+    commitBusy.value = false
+  }
+}
 
 function projectStats(id) {
   const ids = new Set(j.allWeeks.value.filter((w) => w.project_id === id).map((w) => w.id))
@@ -184,6 +224,16 @@ JDT_SUPABASE_ANON_KEY=…</pre>
         <button @click="exportMarkdown">Exporter (Markdown)</button>
         <button :disabled="!selectedWeek" @click="exportPdf(false)">Télécharger PDF (semaine)</button>
         <button :disabled="!j.weeks.value.length" @click="exportPdf(true)">Télécharger PDF (tout le projet)</button>
+        <template v-if="githubReady">
+          <button class="primary" :disabled="commitBusy" @click="commitJournal">
+            {{ commitBusy ? 'Commit en cours…' : 'Commit JDT dans le repo sous doc/' }}
+          </button>
+          <p v-if="commitErr" class="error small">{{ commitErr }}</p>
+          <p v-if="commitMsg" class="ok small">
+            {{ commitMsg }}
+            <a v-if="commitUrl" :href="commitUrl" target="_blank" rel="noopener" class="ext">voir le commit ↗</a>
+          </p>
+        </template>
         <GitHubPanel />
         <button class="ghost" @click="signOut">Déconnexion</button>
       </div>
