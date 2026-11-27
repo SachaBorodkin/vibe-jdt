@@ -197,5 +197,10 @@ table.grid .total-row.project-total td { color: var(--accent); }
 .github form input { border-color: var(--border); background: var(--side); }
 .github code { font-size: 12px; }
 .github .small { margin: 0; }
+.github .help { border-top: 1px solid var(--border); padding-top: 8px; }
+.github .help summary { font-size: 12px; }
+.github .help ol { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--muted); }
+.github .help a { color: var(--accent); }
+.github .help strong { color: var(--text); }
 
 .project-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }

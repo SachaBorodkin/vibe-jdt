@@ -142,10 +142,44 @@ async function commit() {
         <input v-model="token" type="password" placeholder="ghp_… ou github_pat_…" autocomplete="off" />
       </label>
       <p class="muted small">
-        Droit « Contents : Read and write » sur ce dépôt. Le jeton est enregistré une seule fois pour ton
-        compte et réutilisé pour tous tes projets (il reste aussi copié dans ce navigateur).
+        Le jeton est enregistré une seule fois pour ton compte et réutilisé pour tous tes projets (il reste
+        aussi copié dans ce navigateur).
       </p>
       <button :disabled="busy">Enregistrer</button>
+
+      <details class="help">
+        <summary>Comment créer le jeton ?</summary>
+        <ol>
+          <li>
+            Ouvre
+            <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" class="ext">
+              Fine-grained tokens → Generate new token ↗
+            </a>
+            (GitHub : Settings → Developer settings → Personal access tokens).
+          </li>
+          <li><strong>Resource owner</strong> : ton compte (ou l'organisation propriétaire du dépôt).</li>
+          <li>
+            <strong>Repository access</strong> → <em>Only select repositories</em> → le dépôt concerné (ex.
+            <code>vibe-jdt</code>).
+          </li>
+          <li>
+            <strong>Permissions</strong> → <em>Repository permissions</em> → <strong>Contents : Read and write</strong>
+            (laisse tout le reste sur « No access » ; <em>Metadata</em> passe seul en lecture).
+          </li>
+          <li><strong>Expiration</strong> : 90 jours, par exemple.</li>
+          <li>
+            <em>Generate token</em>, puis copie le <code>github_pat_…</code> (affiché une seule fois) et colle-le
+            dans le champ ci-dessus.
+          </li>
+        </ol>
+        <p class="muted small">
+          Un token classique fonctionne aussi :
+          <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener" class="ext">
+            Tokens (classic) ↗
+          </a>
+          avec le seul scope <code>repo</code>.
+        </p>
+      </details>
     </form>
 
     <p class="muted small">Fichier : <code>{{ filePath }}</code></p>

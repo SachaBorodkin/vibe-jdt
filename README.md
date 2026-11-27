@@ -42,7 +42,19 @@ Chaque projet peut être rattaché à un dépôt GitHub. Dans la barre latérale
 
 - le dépôt, au format `propriétaire/dépôt` (ex. `SachaBorodkin/vibe-jdt`) ;
 - la branche (par défaut `main`) ;
-- un jeton d'accès personnel GitHub avec le droit **Contents : Read and write** sur ce dépôt (fine-grained token, ou token classique `ghp_…` avec le scope `repo`).
+- un jeton d'accès personnel GitHub avec le droit **Contents : Read and write** sur ce dépôt.
+
+### Créer le jeton GitHub
+
+1. Ouvre [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new) (Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → *Generate new token*).
+2. **Resource owner** : ton compte (ou l'organisation propriétaire du dépôt).
+3. **Repository access** → *Only select repositories* → le dépôt concerné (ex. `vibe-jdt`).
+4. **Permissions** → *Repository permissions* → **Contents : Read and write**. Laisse tout le reste sur « No access » (*Metadata* passe seul en lecture).
+5. **Expiration** : 90 jours par exemple — à renouveler dans le panneau une fois expiré.
+6. *Generate token*, copie le `github_pat_…` (affiché une seule fois) et colle-le dans le champ **Jeton GitHub**, puis clique sur **Enregistrer**.
+
+Un token classique marche aussi : [github.com/settings/tokens/new](https://github.com/settings/tokens/new) avec le seul scope `repo` (`ghp_…`).
+Les mêmes étapes sont rappelées dans l'app, sous **Dépôt GitHub → Comment créer le jeton ?**.
 
 Le bouton **Commit JDT dans le repo sous doc/** écrit le journal du projet dans `doc/jdt-<projet>.md` (fichier stable, mis à jour à chaque commit) avec le message :
 
