@@ -7,6 +7,7 @@ const allWeeks = ref([])
 const allEntries = ref([])
 const allEvents = ref([])
 const projectId = ref(null)
+const githubToken = ref('')
 const loading = ref(false)
 const error = ref('')
 
@@ -24,7 +25,7 @@ const project = computed(() => projects.value.find((p) => p.id === projectId.val
 function fail(err) {
   if (err) {
     const msg = err.message || String(err)
-    if (/github_(repo|branch)/i.test(msg)) {
+    if (/github_tokens|github_(repo|branch)/i.test(msg)) {
       error.value = `${msg} — la base n'est pas à jour : exécute supabase/migration_github.sql dans le SQL Editor de Supabase, puis recharge la page.`
     } else if (/projects|project_id/i.test(msg)) {
       error.value = `${msg} — la base n'est pas à jour : exécute supabase/migration_projects.sql dans le SQL Editor de Supabase, puis recharge la page.`
@@ -72,6 +73,11 @@ async function loadAll() {
   let last = null
   try { last = localStorage.getItem(LAST_KEY) } catch { /* ignore */ }
   projectId.value = projects.value.find((x) => x.id === last)?.id ?? projects.value[0]?.id ?? null
+
+  // Jeton GitHub : une seule ligne par compte. Silencieux si la table n'existe pas encore
+  // (migration non lancée) : le jeton reste alors dans le navigateur.
+  const t = await supabase.from('github_tokens').select('token').maybeSingle()
+  githubToken.value = t.error ? '' : t.data?.token || ''
 }
 
 function reset() {
@@ -80,6 +86,7 @@ function reset() {
   allEntries.value = []
   allEvents.value = []
   projectId.value = null
+  githubToken.value = ''
 }
 
 function selectProject(id) {
@@ -114,6 +121,22 @@ async function deleteProject(id) {
   allEntries.value = allEntries.value.filter((e) => !gone.has(e.week_id))
   allEvents.value = allEvents.value.filter((e) => !gone.has(e.week_id))
   if (projectId.value === id) selectProject(projects.value[0]?.id ?? null)
+}
+
+/* ---------- Jeton GitHub (un par compte) ---------- */
+async function saveGithubToken(token) {
+  const { data } = await supabase.auth.getUser()
+  const user_id = data?.user?.id
+  if (!user_id) {
+    error.value = 'Session expirée : reconnecte-toi pour enregistrer le jeton.'
+    return false
+  }
+  const { error: err } = await supabase
+    .from('github_tokens')
+    .upsert({ user_id, token, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
+  if (fail(err)) return false
+  githubToken.value = token
+  return true
 }
 
 /* ---------- Semaines ---------- */
@@ -190,8 +213,8 @@ async function deleteEvent(id) {
 export function useJournal() {
   return {
     projects, project, projectId, weeks, entries, events, loading, error,
-    allWeeks, allEntries,
-    loadAll, reset, selectProject,
+    allWeeks, allEntries, githubToken,
+    loadAll, reset, selectProject, saveGithubToken,
     addProject, updateProject, deleteProject,
     addWeek, updateWeek, deleteWeek,
     addEntry, updateEntry, deleteEntry,

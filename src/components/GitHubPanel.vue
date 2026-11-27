@@ -19,9 +19,17 @@ function readToken() {
   }
 }
 
+function writeToken(value) {
+  try {
+    localStorage.setItem(TOKEN_KEY, value)
+  } catch {
+    /* stockage indisponible : le jeton reste en mémoire */
+  }
+}
+
 const repo = ref('')
 const branch = ref('main')
-const token = ref(readToken())
+const token = ref(j.githubToken.value || readToken())
 const busy = ref(false)
 const msg = ref('')
 const err = ref('')
@@ -39,6 +47,14 @@ watch(
   { immediate: true },
 )
 
+// Le jeton arrive avec loadAll() : on préremplit le champ dès qu'il est connu.
+watch(
+  () => j.githubToken.value,
+  (t) => {
+    if (t) token.value = t
+  },
+)
+
 const projectName = computed(() => project.value?.name || 'Journal de travail')
 const filePath = computed(() => `doc/jdt-${slugify(projectName.value)}.md`)
 const ready = computed(() => Boolean(parseRepo(repo.value) && token.value.trim()))
@@ -51,17 +67,27 @@ async function save() {
     return
   }
   if (!project.value) return
-  try {
-    localStorage.setItem(TOKEN_KEY, token.value.trim())
-  } catch {
-    /* stockage indisponible : le jeton reste en mémoire */
-  }
-  const ok = await j.updateProject(project.value.id, {
+
+  let ok = await j.updateProject(project.value.id, {
     github_repo: repo.value.trim(),
     github_branch: branch.value.trim() || 'main',
   })
-  if (ok) msg.value = 'Dépôt enregistré pour ce projet.'
-  else err.value = j.error.value
+
+  const value = token.value.trim()
+  let storedToken = true
+  if (value) {
+    storedToken = await j.saveGithubToken(value)
+    if (storedToken) writeToken(value)
+  }
+  if (!storedToken) err.value = j.error.value
+
+  if (ok && storedToken) {
+    msg.value = value
+      ? 'Dépôt et jeton enregistrés : le jeton est réutilisé pour tous tes projets.'
+      : 'Dépôt enregistré pour ce projet.'
+  } else if (!err.value) {
+    err.value = j.error.value
+  }
 }
 
 async function commit() {
@@ -90,6 +116,12 @@ async function commit() {
     })
     commitUrl.value = res.commitUrl
     msg.value = `Journal commité dans ${res.path}.`
+
+    // Le jeton est mémorisé une seule fois pour le compte (et dans ce navigateur).
+    const value = token.value.trim()
+    if (value && value !== j.githubToken.value) {
+      if (await j.saveGithubToken(value)) writeToken(value)
+    }
   } catch (e) {
     err.value = e?.message || String(e)
   } finally {
@@ -110,8 +142,8 @@ async function commit() {
         <input v-model="token" type="password" placeholder="ghp_… ou github_pat_…" autocomplete="off" />
       </label>
       <p class="muted small">
-        Droit « Contents : Read and write » sur ce dépôt. Le jeton reste dans ce navigateur, il n'est pas
-        enregistré dans Supabase.
+        Droit « Contents : Read and write » sur ce dépôt. Le jeton est enregistré une seule fois pour ton
+        compte et réutilisé pour tous tes projets (il reste aussi copié dans ce navigateur).
       </p>
       <button :disabled="busy">Enregistrer</button>
     </form>

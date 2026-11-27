@@ -46,6 +46,12 @@ create table if not exists public.events (
   created_at    timestamptz not null default now()
 );
 
+create table if not exists public.github_tokens (
+  user_id     uuid primary key default auth.uid() references auth.users(id) on delete cascade,
+  token       text not null,              -- jeton d'accès GitHub (une seule saisie par utilisateur)
+  updated_at  timestamptz not null default now()
+);
+
 create index if not exists weeks_project_idx on public.weeks(project_id);
 create index if not exists entries_week_idx  on public.entries(week_id);
 create index if not exists events_week_idx   on public.events(week_id);
@@ -55,8 +61,10 @@ alter table public.projects enable row level security;
 alter table public.weeks    enable row level security;
 alter table public.entries  enable row level security;
 alter table public.events   enable row level security;
+alter table public.github_tokens enable row level security;
 
 create policy "projects: own rows" on public.projects for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "weeks: own rows"    on public.weeks    for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "entries: own rows"  on public.entries  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "events: own rows"   on public.events   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "github_tokens: own rows" on public.github_tokens for all using (auth.uid() = user_id) with check (auth.uid() = user_id);

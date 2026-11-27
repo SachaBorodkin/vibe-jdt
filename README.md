@@ -7,7 +7,7 @@ App Vue 3 + Vite + Supabase pour tenir un journal de travail organisé par semai
 1. Crée un projet sur [supabase.com](https://supabase.com).
 2. Dans **SQL Editor**, exécute `supabase/schema.sql` (tables + Row Level Security).
    - Si tu utilisais déjà la version sans projets, exécute à la place `supabase/migration_projects.sql` : tes semaines existantes sont rattachées à un projet « Mon projet ».
-   - Si tu veux committer le journal sur GitHub, exécute aussi `supabase/migration_github.sql` (colonnes `github_repo` / `github_branch`).
+   - Si tu veux committer le journal sur GitHub, exécute aussi `supabase/migration_github.sql` (colonnes `github_repo` / `github_branch` et table `github_tokens`).
 3. Dans **Authentication > Providers**, laisse Email activé (désactive « Confirm email » si tu veux te connecter directement après inscription).
 4. Copie `.env.example` en `.env` et renseigne l'URL et la clé `anon` (Project Settings > API).
 5. Lance :
@@ -50,7 +50,9 @@ Le bouton **Commit JDT dans le repo sous doc/** écrit le journal du projet dans
 docs(doc): Rédaction du JDT (fichier généré à partir de https://vibe-jdt.vercel.app/)
 ```
 
-Le dépôt et la branche sont enregistrés sur le projet (Supabase). Le jeton, lui, reste dans le navigateur (`localStorage`, clé `jdt:githubToken`) et n'est jamais envoyé à Supabase : utilise un jeton limité à ce seul dépôt.
+Le dépôt et la branche sont enregistrés sur le projet ; le jeton est enregistré **une seule fois par compte** (table `github_tokens`, une ligne par utilisateur, protégée par Row Level Security) et réutilisé pour tous les projets. Il est aussi copié dans le navigateur (`localStorage`, clé `jdt:githubToken`) pour fonctionner même sans la migration.
+
+> Le jeton est stocké en clair dans la base : utilise un jeton *fine-grained* limité à ce seul dépôt, avec la seule permission **Contents : Read and write** et une date d'expiration. Toute personne qui obtient ta session (ou un script injecté dans la page) peut le lire.
 
 ## Variables d'environnement / Vercel
 
