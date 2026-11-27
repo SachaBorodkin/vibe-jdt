@@ -226,8 +226,8 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
         <thead>
           <tr>
             <th class="c-date">Date</th>
-            <th class="c-state">Type</th>
-            <th>Description</th>
+            <th class="c-type">Type</th>
+            <th class="c-desc">Description</th>
             <th class="c-dur">Temps perdu</th>
             <th class="c-act no-print"></th>
           </tr>
@@ -236,12 +236,22 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
           <tr v-if="!weekEvents.length"><td colspan="5" class="empty">Aucun événement.</td></tr>
           <tr v-for="v in weekEvents" :key="v.id">
             <td class="c-date"><input type="date" :value="v.date" @change="j.updateEvent(v.id, { date: $event.target.value })" /></td>
-            <td class="center">
+            <td class="center c-type">
               <select :value="v.kind" @change="j.updateEvent(v.id, { kind: $event.target.value })">
                 <option v-for="(label, k) in EVENT_KINDS" :key="k" :value="k">{{ label }}</option>
               </select>
             </td>
-            <td><input :value="v.description" placeholder="Description" @change="j.updateEvent(v.id, { description: $event.target.value })" /></td>
+            <td class="c-desc">
+              <textarea
+                v-autosize
+                class="multi"
+                rows="1"
+                :value="v.description"
+                placeholder="Description"
+                @input="resizeEl($event.target)"
+                @change="j.updateEvent(v.id, { description: $event.target.value })"
+              ></textarea>
+            </td>
             <td><input class="dur" :value="fmtMin(v.minutes_lost)" @change="setLost(v, $event)" /></td>
             <td class="c-act no-print"><button class="icon danger" title="Supprimer" @click="j.deleteEvent(v.id)">✕</button></td>
           </tr>

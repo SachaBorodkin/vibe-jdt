@@ -130,6 +130,12 @@ table.grid .c-ot { width: 44px; }
 table.grid .c-art { width: 180px; }
 table.grid .c-task { width: 24%; }
 table.grid .c-comment { width: 27%; }
+table.grid .c-type { width: 150px; }
+table.grid .c-desc { width: auto; }
+/* En-têtes alignés sur le contenu de leur colonne (textes à gauche, listes/valeurs au centre) */
+table.grid th.c-date, table.grid th.c-task, table.grid th.c-comment, table.grid th.c-art, table.grid th.c-desc {
+  text-align: left;
+}
 /* Champs multi-lignes : le texte s'affiche en entier et le tableau s'adapte */
 table.grid .cell-stack { display: flex; flex-direction: column; gap: 2px; }
 table.grid textarea.multi { resize: none; overflow: hidden; min-height: 32px; line-height: 1.35; padding: 5px 6px; }
