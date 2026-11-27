@@ -122,14 +122,18 @@ table.grid th { text-align: center; font-weight: 700; padding: 10px 8px; white-s
 table.grid td.center { text-align: center; }
 table.grid td.empty { color: var(--muted); text-align: center; padding: 18px; }
 table.grid td.c-act, table.grid th.c-act { width: 44px; text-align: center; border: none; padding: 0 0 0 4px; }
-table.grid .c-date { width: 140px; }
-table.grid .c-state { width: 110px; }
-table.grid .c-dur { width: 100px; }
-table.grid .c-out { width: 100px; }
-table.grid .c-ot { width: 46px; }
-table.grid .c-art { width: 190px; }
-table.grid .c-task { width: 22%; }
-table.grid .c-comment { width: 28%; }
+table.grid .c-date { width: 132px; }
+table.grid .c-state { width: 104px; }
+table.grid .c-dur { width: 118px; white-space: nowrap; }
+table.grid .c-out { width: 96px; }
+table.grid .c-ot { width: 44px; }
+table.grid .c-art { width: 180px; }
+table.grid .c-task { width: 24%; }
+table.grid .c-comment { width: 27%; }
+/* Champs multi-lignes : le texte s'affiche en entier et le tableau s'adapte */
+table.grid .cell-stack { display: flex; flex-direction: column; gap: 2px; }
+table.grid textarea.multi { resize: none; overflow: hidden; min-height: 32px; line-height: 1.35; padding: 5px 6px; }
+table.grid tbody tr:not(.total-row):hover > td { background: color-mix(in srgb, var(--accent-soft) 30%, transparent); }
 table.grid input.dur { text-align: center; font-variant-numeric: tabular-nums; }
 table.grid select { text-align: center; }
 table.grid select.success { color: var(--ok); }

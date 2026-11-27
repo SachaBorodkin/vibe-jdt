@@ -46,6 +46,15 @@ function needsComment(e) {
   return (e.minutes || 0) >= 45
 }
 
+/** Champ texte qui grandit avec son contenu : rien n'est tronqué dans le tableau. */
+function resizeEl(el) {
+  if (!el || !el.scrollHeight) return
+  el.style.height = 'auto'
+  el.style.height = `${el.scrollHeight}px`
+}
+
+const vAutosize = { mounted: resizeEl, updated: resizeEl }
+
 function defaultDate() {
   const start = parseISO(props.week.start_date)
   const today = new Date()
@@ -133,8 +142,18 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
                 <input type="date" :value="r.e.date" @change="j.updateEntry(r.e.id, { date: $event.target.value })" />
               </td>
               <td>
-                <input :value="r.e.task" placeholder="Tâche réalisée" @change="j.updateEntry(r.e.id, { task: $event.target.value })" />
-                <span v-if="r.e.status === 'wip'" class="tag-wip">[WIP]</span>
+                <div class="cell-stack">
+                  <textarea
+                    v-autosize
+                    class="multi"
+                    rows="1"
+                    :value="r.e.task"
+                    placeholder="Tâche réalisée"
+                    @input="resizeEl($event.target)"
+                    @change="j.updateEntry(r.e.id, { task: $event.target.value })"
+                  ></textarea>
+                  <span v-if="r.e.status === 'wip'" class="tag-wip">[WIP]</span>
+                </div>
               </td>
               <td class="center">
                 <select :value="r.e.status" @change="j.updateEntry(r.e.id, { status: $event.target.value })">
@@ -144,17 +163,20 @@ const validUrl = (u) => /^https?:\/\//i.test(u || '')
               </td>
               <td>
                 <textarea
+                  v-autosize
+                  class="multi"
                   rows="1"
                   :class="{ missing: needsComment(r.e) && !r.e.comment?.trim() }"
                   :value="r.e.comment"
                   :placeholder="needsComment(r.e) ? 'Commentaire requis (≥ 45 min)' : ''"
+                  @input="resizeEl($event.target)"
                   @change="j.updateEntry(r.e.id, { comment: $event.target.value.trim() || null })"
                 ></textarea>
               </td>
               <td><input class="dur" :value="fmtMin(r.e.minutes)" title="Ex. 45, 1h30, 1:15" @change="setDuration(r.e, $event)" /></td>
               <td>
                 <div class="inline">
-                  <input :value="r.e.commit_url" placeholder="https://…/commit/…" @change="j.updateEntry(r.e.id, { commit_url: $event.target.value.trim() || null })" />
+                  <input :value="r.e.commit_url" placeholder="Lien du commit" @change="j.updateEntry(r.e.id, { commit_url: $event.target.value.trim() || null })" />
                   <a v-if="validUrl(r.e.commit_url)" :href="r.e.commit_url" target="_blank" rel="noopener" class="ext" title="Ouvrir le commit">↗</a>
                 </div>
               </td>
